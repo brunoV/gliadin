@@ -16,6 +16,8 @@ use Bio::SlidingWindow 'subsequence_iterator';
 sub insert_protein {
     my ($self, $protein, $type) = @_;
 
+    unless ($type) { die "Undefined protein type" };
+
     my $protein_rs;
 
     $self->txn_do(sub {
