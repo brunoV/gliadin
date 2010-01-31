@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+
+BEGIN {
+    use FindBin qw( $Bin );
+    use lib "$Bin/../lib";
+}
+
+use Modern::Perl;
+use Getopt::Long;
+use Pod::Usage;
+use Try::Tiny;
+
+use Bio::SeqIO;
+use Gliadin::Schema;
+
+my ($db_file, $type, $species, $help);
+
+my $result = GetOptions(
+    "db=s"      => \$db_file,
+    "type=s"    => \$type,
+    "species=s" => \$species,
+    'help|?'    => \$help
+) or pod2usage(2);
+
+pod2usage(2) if ($help or not $db_file or @ARGV == 0);
+
+my @files = @ARGV;
+
+my $db = connect_to_db($db_file);
+
+my @proteins = get_proteins(@files);
+
+$db->txn_do(sub {
+    foreach my $protein (@proteins) {
+        try   { $db->insert_protein($protein, $type, $species) }
+        catch {
+            warn "insertion failed for " . $protein->accession_number . ": $_"
+        }
+    }
+});
+
+sub get_proteins {
+    my @files = @_;
+
+    my @proteins;
+
+    foreach my $file (@files) {
+        push @proteins, file_to_proteins( $file );
+    }
+
+    return @proteins;
+}
+
+sub file_to_proteins {
+    my $file = shift;
+
+    my $seqI = Bio::SeqIO->new( -file => $file );
+
+    my @proteins;
+
+    while ( my $seq = $seqI->next_seq ) {
+        push @proteins, $seq;
+    }
+
+    return @proteins;
+}
+
+sub connect_to_db {
+    my $db_file = shift;
+
+    my $db = Gliadin::Schema->connect("dbi:SQLite:$db_file");
+    $db->deploy unless -e $db_file;
+
+    return $db;
+}
+
+__END__
+
+=head1 import-to-db
+
+import sequences from genbank flatfiles to sqlite database
+
+=head1 SYNOPSIS
+
+import-to-db --db=database_file.sqlite --type=protein_type --species=wheat [genbank_file1 genbank_file2 ...]
+
+Options:
+    -help    brief help message
