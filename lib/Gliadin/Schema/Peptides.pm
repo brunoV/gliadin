@@ -32,6 +32,6 @@ __PACKAGE__->add_unique_constraint("sequence_unique", ["sequence"]);
 
 __PACKAGE__->has_many('proteins_peptides', "Gliadin::Schema::ProteinsPeptides", { "foreign.peptide_id" => 'self.id' });
 
-__PACKAGE__->many_to_many('proteins', 'protein_peptides', 'protein');
+__PACKAGE__->many_to_many('proteins', 'proteins_peptides', 'protein');
 
 1;

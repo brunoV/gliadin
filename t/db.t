@@ -61,4 +61,29 @@ Peptides: {
 
 }
 
+Integrity: {
+
+    # When the same peptide is added to different proteins, the peptide
+    # keeps connected to both of the parent proteins
+
+    my $p = Protein->new(
+        seq              => 'MAEOL',
+        species          => Species->new( common_name => 'wheat' ),
+        description      => 'foobar',
+        accession_number => 'abd2',
+    );
+
+    $protein_rs = $db->insert_protein($p, 'gliadin');
+
+    my $peptide_rs = $protein_rs->add_to_peptides({
+        sequence => 'FOO',
+    });
+
+    my @proteins = $peptide_rs->proteins;
+
+    isa_ok($_, 'Gliadin::Schema::Proteins') for @proteins;
+
+    is @proteins, 2, 'Peptide <-> Protein relationship';
+}
+
 done_testing();
