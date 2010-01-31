@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+use File::Basename 'basename';
+use FindBin '$Bin';
+
+my @files = @ARGV;
+
+foreach my $filename (@files) {
+
+    my $basename = basename($filename, '.gb');
+    $basename =~ s/_/ /g;
+
+    my ($species, $type) = split / /, $basename, 2;
+
+    say "inserting $filename";
+    system( qq($Bin/import-to-db --db=prueba.sqlite --type="$type" --species=$species $filename) );
+}
