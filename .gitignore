@@ -10,3 +10,6 @@ cover_db
 nytprof/
 .prove
 .build
+*.sqlite
+sequences/
+bin/bp_download*pl
