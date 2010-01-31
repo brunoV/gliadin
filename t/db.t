@@ -36,7 +36,8 @@ Basic: {
 my $protein_rs;
 
 Inserting: {
-# Inserting Protein
+
+    # Inserting Protein
 
     my $p = Protein->new(
         seq              => 'MAEEL',
@@ -52,7 +53,9 @@ Inserting: {
 }
 
 Peptides: {
-# Adding a peptide
+
+    # Adding a peptide
+
     my $peptide_rs = $protein_rs->add_to_peptides({
         sequence => 'FOO',
     });
