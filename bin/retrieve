@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+
+my @species  = qw(oat barley rye wheat);
+# my @proteins = ("alpha gliadin", "beta gliadin", "gamma gliadin", "omega gliadin");
+# my @proteins = ("glutenin");
+# my @proteins = ("hordein");
+# my @proteins = ("secalin");
+my @proteins = ("avenin");
+
+foreach my $protein (@proteins) {
+    foreach my $species (@species) {
+        my $query = $species . "[Organism] AND $protein";
+        my $filename = join('_', ( split / /, "$species $protein" ) ) . '.gb';
+
+        system(qq(./bp_download_query_genbank.pl --query="$query" --db=protein --format=genbank -o $filename));
+    }
+}

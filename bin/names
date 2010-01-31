@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+
+# From a list of files from input, outputs the file name, and the ids
+# and description of the sequences stored in it, like so:
+# file1
+#   id1 description1
+#   id2 description2
+# file2
+#   id3 description3
+
+my @files = @ARGV or die "names FILE(s)";
+
+use Bio::SeqIO;
+
+foreach my $file (@files) {
+    my $seqI = Bio::SeqIO->new( -file => $file );
+
+    say $file;
+
+    while (my $seq = $seqI->next_seq) {
+        say "\t" . $seq->accession_number . "\t" . $seq->description;
+    }
+}

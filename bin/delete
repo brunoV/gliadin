@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+use Bio::SeqIO;
+use Data::Dumper;
+
+# expects to be piped a list of files and ID of proteins to delete from
+# such files, such as:
+# file1
+#   id1
+#   id2
+# file2
+#   id3
+#   id4
+# 
+# It will then delete them
+
+my @contents = <STDIN>;
+
+my $record;
+
+while (my $line = shift @contents) {
+    chomp $line;
+
+    given ($line) {
+        when (/^\t/) {
+            my (undef, $id) = split /\t/, $line;
+            push @{$record->[-1]}, $id;
+        }
+        when (/^\S/) {
+            push @$record, [$line];
+        }
+    }
+}
+
+foreach my $entry (@$record) {
+    my ($file, @proteins) = @$entry;
+
+    my $seqI = Bio::SeqIO->new( -file => $file );
+
+    my @keep;
+
+    while (my $seq_obj = $seqI->next_seq ) {
+        push @keep, $seq_obj unless $seq_obj->accession_number ~~ @proteins;
+    }
+
+    undef $seqI;
+
+    my $seqO = Bio::SeqIO->new( -file => ">$file", -format => 'genbank' );
+
+    $seqO->write_seq($_) for @keep;
+
+}
