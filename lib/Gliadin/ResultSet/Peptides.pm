@@ -37,4 +37,6 @@ sub _join_to_proteins {
     );
 }
 
+__PACKAGE__->load_components("Helper::ResultSet::Union");
+
 1;

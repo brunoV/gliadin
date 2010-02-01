@@ -95,7 +95,7 @@ ResultSet: {
 
     my $pep_rs = $db->resultset('Peptides');
 
-    can_ok( $pep_rs, qw(of_type of_species not_of_type not_of_species) );
+    can_ok( $pep_rs, qw(union of_type of_species not_of_type not_of_species) );
 
     isa_ok( $pep_rs->of_type('foo'),        'Gliadin::ResultSet::Peptides' );
     isa_ok( $pep_rs->not_of_type('foo'),    'Gliadin::ResultSet::Peptides' );
@@ -112,6 +112,15 @@ ResultSet: {
     is $pep_rs->of_species('buffalo')->count,     0;
     is $pep_rs->not_of_species('buffalo')->count, $total_count;
     is $pep_rs->not_of_species('wheat')->count,   0;
+
+    # Testing union
+    my $rs1 = $pep_rs->of_type('gliadin');
+    my $rs2 = $pep_rs->of_species('wheat');
+    my $rs3 = $pep_rs->of_species('buffalo');
+
+    my $union = $rs1->union([$rs2, $rs3]);
+
+    is $union->count, $total_count;
 
 }
 
