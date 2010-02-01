@@ -34,4 +34,6 @@ __PACKAGE__->has_many('proteins_peptides', "Gliadin::Schema::ProteinsPeptides", 
 
 __PACKAGE__->many_to_many('proteins', 'proteins_peptides', 'protein');
 
+__PACKAGE__->resultset_class("Gliadin::ResultSet::Peptides");
+
 1;
