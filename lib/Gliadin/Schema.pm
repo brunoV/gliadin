@@ -14,16 +14,17 @@ __PACKAGE__->load_classes;
 use Bio::SlidingWindow 'subsequence_iterator';
 
 sub insert_protein {
-    my ($self, $protein, $type) = @_;
+    my ( $self, $protein, $type, $species ) = @_;
 
     unless ($type) { die "Undefined protein type" };
+    unless ($species) { die "Undefined species" }
 
     my $protein_rs;
 
     $self->txn_do(sub {
 
         $protein_rs = $self->resultset('Proteins')->create({
-            species  => $protein->species->common_name,
+            species  => $species,
             name     => $protein->description,
             sequence => $protein->seq,
             type     => $type,

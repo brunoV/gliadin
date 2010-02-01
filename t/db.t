@@ -23,7 +23,7 @@ Basic: {
     package Protein;
     use Moose;
 
-    has [qw(species description seq type accession_number)] => ( is => 'ro' );
+    has [qw(description seq type accession_number)] => ( is => 'ro' );
 }
 
 {
@@ -41,12 +41,11 @@ Inserting: {
 
     my $p = Protein->new(
         seq              => 'MAEEL',
-        species          => Species->new( common_name => 'wheat' ),
         description      => 'foobar',
         accession_number => 'abd',
     );
 
-    $protein_rs = $db->insert_protein($p, 'gliadin');
+    $protein_rs = $db->insert_protein($p, 'gliadin', 'wheat');
 
     isa_ok($protein_rs, 'Gliadin::Schema::Proteins');
 
@@ -71,12 +70,11 @@ Integrity: {
 
     my $p = Protein->new(
         seq              => 'MAEOL',
-        species          => Species->new( common_name => 'wheat' ),
         description      => 'foobar',
         accession_number => 'abd2',
     );
 
-    $protein_rs = $db->insert_protein($p, 'gliadin');
+    $protein_rs = $db->insert_protein($p, 'gliadin', 'wheat');
 
     my $peptide_rs = $protein_rs->add_to_peptides({
         sequence => 'FOO',
