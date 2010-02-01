@@ -85,6 +85,8 @@ Integrity: {
     isa_ok($_, 'Gliadin::Schema::Proteins') for @proteins;
 
     is @proteins, 2, 'Peptide <-> Protein relationship';
+
+    lives_ok { $db->insert_protein($p, 'gliadin', 'wheat') };
 }
 
 done_testing();

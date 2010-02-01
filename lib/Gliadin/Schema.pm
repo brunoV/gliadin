@@ -37,8 +37,16 @@ sub insert_protein {
             my @peptides =
               map { { sequence => $_ } } _get_peptides( $protein->seq, 2, 12 );
 
-        $protein_rs->add_to_peptides($_) for @peptides;
-    });
+            my $peptides_rs = $self->resultset('Peptides');
+
+            foreach my $peptide (@peptides) {
+                my $exists =
+                  $peptides_rs->find( $peptide, { key => 'sequence_unique' } );
+
+                $protein_rs->add_to_peptides($peptide) unless $exists;
+            }
+        }
+    );
 
     return $protein_rs;
 }
