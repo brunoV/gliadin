@@ -89,4 +89,30 @@ Integrity: {
     lives_ok { $db->insert_protein($p, 'gliadin', 'wheat') };
 }
 
+ResultSet: {
+
+    # Using custom ResultSet methods
+
+    my $pep_rs = $db->resultset('Peptides');
+
+    can_ok( $pep_rs, qw(of_type of_species not_of_type not_of_species) );
+
+    isa_ok( $pep_rs->of_type('foo'),        'Gliadin::ResultSet::Peptides' );
+    isa_ok( $pep_rs->not_of_type('foo'),    'Gliadin::ResultSet::Peptides' );
+    isa_ok( $pep_rs->of_species('foo'),     'Gliadin::ResultSet::Peptides' );
+    isa_ok( $pep_rs->not_of_species('foo'), 'Gliadin::ResultSet::Peptides' );
+
+    my $total_count = $pep_rs->count;
+
+    is $pep_rs->of_type('gliadin')->count,        $total_count;
+    is $pep_rs->of_type('spaguetti')->count,      0;
+    is $pep_rs->not_of_type('spaguetti')->count,  $total_count;
+    is $pep_rs->not_of_type('gliadin')->count,    0;
+    is $pep_rs->of_species('wheat')->count,       $total_count;
+    is $pep_rs->of_species('buffalo')->count,     0;
+    is $pep_rs->not_of_species('buffalo')->count, $total_count;
+    is $pep_rs->not_of_species('wheat')->count,   0;
+
+}
+
 done_testing();
