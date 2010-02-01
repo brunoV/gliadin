@@ -37,6 +37,14 @@ sub _join_to_proteins {
     );
 }
 
+sub intersection {
+    my ($self, $other) = @_;
+
+    return $self->search(
+        { 'me.id' => { IN => $other->get_column('id')->as_query } }
+    );
+}
+
 __PACKAGE__->load_components("Helper::ResultSet::Union");
 
 1;
