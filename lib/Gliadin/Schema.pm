@@ -24,7 +24,7 @@ sub insert_protein {
     $self->txn_do(
         sub {
 
-            $protein_rs = $self->resultset('Proteins')->update_or_create(
+            $protein_rs = $self->resultset('Proteins')->create(
                 {
                     species  => $species,
                     name     => $protein->description,
@@ -40,10 +40,8 @@ sub insert_protein {
             my $peptides_rs = $self->resultset('Peptides');
 
             foreach my $peptide (@peptides) {
-                my $exists =
-                  $peptides_rs->find( $peptide, { key => 'sequence_unique' } );
 
-                $protein_rs->add_to_peptides($peptide) unless $exists;
+                $protein_rs->add_to_peptides($peptide);
             }
         }
     );

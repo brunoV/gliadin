@@ -84,7 +84,7 @@ Integrity: {
 
     is @proteins, 2, 'Peptide <-> Protein relationship';
 
-    lives_ok { $db->insert_protein($p, 'gliadin', 'wheat') };
+    dies_ok { $db->insert_protein($p, 'gliadin', 'wheat') };
 }
 
 ResultSet: {
