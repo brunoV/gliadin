@@ -1,4 +1,5 @@
 package Gliadin::ResultSet::Peptides;
+use Modern::Perl;
 use base 'DBIx::Class::ResultSet';
 
 sub of_type {
@@ -31,7 +32,7 @@ sub _join_to_proteins {
     return $self->search(
         { "protein.$field" => { $operator => $value } },
         {
-            join     => { proteins_peptides => {'protein'} },
+            join     => { proteins_peptides => 'protein' },
             distinct => 1
         }
     );
