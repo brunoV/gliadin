@@ -72,7 +72,7 @@ Integrity: {
         accession_number => 'abd2',
     );
 
-    $protein_rs = $db->insert_protein($p, 'gliadin', 'wheat');
+    $protein_rs = $db->insert_protein($p, 'spagetti', 'buffalo');
 
     my $peptide_rs = $protein_rs->add_to_peptides({
         sequence => 'FOO',
@@ -103,14 +103,14 @@ ResultSet: {
 
     my $total_count = $pep_rs->count;
 
-    is $pep_rs->of_type('gliadin')->count,        $total_count;
-    is $pep_rs->of_type('spaguetti')->count,      0;
-    is $pep_rs->not_of_type('spaguetti')->count,  $total_count;
-    is $pep_rs->not_of_type('gliadin')->count,    0;
-    is $pep_rs->of_species('wheat')->count,       $total_count;
-    is $pep_rs->of_species('buffalo')->count,     0;
-    is $pep_rs->not_of_species('buffalo')->count, $total_count;
-    is $pep_rs->not_of_species('wheat')->count,   0;
+    is $pep_rs->of_type('gliadin')->count,        11;
+    is $pep_rs->of_type('spagetti')->count,       11;
+    is $pep_rs->not_of_type('spagetti')->count,   11;
+    is $pep_rs->not_of_type('gliadin')->count,    11;
+    is $pep_rs->of_species('wheat')->count,       11;
+    is $pep_rs->of_species('buffalo')->count,     11;
+    is $pep_rs->not_of_species('buffalo')->count, 11;
+    is $pep_rs->not_of_species('wheat')->count,   11;
 
     # Testing union
     my $rs1 = $pep_rs->of_type('gliadin');
