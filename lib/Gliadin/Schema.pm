@@ -51,6 +51,50 @@ sub insert_protein {
     return $protein_rs;
 }
 
+sub insert_peptide_rr {
+
+    # insert a peptide resultrow
+
+    my ( $self, $peptide ) = @_;
+
+    my $entry = $self->resultset('Peptides')->create(
+        {
+            id       => $peptide->id,
+            sequence => $peptide->sequence,
+        }
+    );
+
+    foreach my $protein ( $peptide->proteins ) {
+        $entry->add_to_proteins(
+            {
+                id       => $protein->id,
+                species  => $protein->species,
+                type     => $protein->type,
+                sequence => $protein->sequence,
+                gi       => $protein->gi,
+            }
+        );
+    }
+
+    return $entry;
+
+}
+
+sub insert_peptide_rs {
+
+    # insert a peptide resultset
+
+    my ( $self, $peptide_rs ) = @_;
+
+    $self->txn_do(
+        sub {
+            foreach my $peptide ( $peptide_rs->all ) {
+                $self->insert_peptide_rr($peptide);
+            }
+        }
+    );
+}
+
 sub _get_peptides {
 
     # Take a sequence, an upper and a lower bound and return a list of
