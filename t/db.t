@@ -41,7 +41,6 @@ Inserting: {
 
     my $p = Protein->new(
         seq              => 'MAEEL',
-        description      => 'foobar',
         accession_number => 'abd',
     );
 
@@ -70,7 +69,6 @@ Integrity: {
 
     my $p = Protein->new(
         seq              => 'MAEOL',
-        description      => 'foobar',
         accession_number => 'abd2',
     );
 
