@@ -45,6 +45,4 @@ sub intersection {
     );
 }
 
-__PACKAGE__->load_components("Helper::ResultSet::Union");
-
 1;

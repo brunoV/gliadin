@@ -94,7 +94,7 @@ ResultSet: {
     my $pep_rs = $db->resultset('Peptides');
 
     can_ok( $pep_rs,
-        qw(union intersection of_type of_species not_of_type not_of_species) );
+        qw(intersection of_type of_species not_of_type not_of_species) );
 
     isa_ok( $pep_rs->of_type('foo'),        'Gliadin::ResultSet::Peptides' );
     isa_ok( $pep_rs->not_of_type('foo'),    'Gliadin::ResultSet::Peptides' );
@@ -112,21 +112,16 @@ ResultSet: {
     is $pep_rs->not_of_species('buffalo')->count, 11;
     is $pep_rs->not_of_species('wheat')->count,   11;
 
-    # Testing union
+    # Testing intersection
     my $rs1 = $pep_rs->of_type('gliadin');
     my $rs2 = $pep_rs->of_species('wheat');
     my $rs3 = $pep_rs->of_species('buffalo');
 
-    my $union = $rs1->union([$rs2, $rs3]);
+    my $i1 = $rs1->intersection($rs2);
+    is $i1->count, $rs1->count;
 
-    is $union->count, $total_count;
-
-    # Testing intersection
-    my $full  = $rs1->intersection($rs2);
-    my $void  = $rs1->intersection($rs3);
-
-    is $full->count, $total_count;
-    is $void->count, 0;
+    my $i2 = $rs1->intersection($rs3);
+    is $i2->count, 4;
 
 }
 
