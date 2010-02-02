@@ -38,11 +38,36 @@ sub _join_to_proteins {
     );
 }
 
+sub union {
+    my ( $self, @other ) = @_;
+
+    # Create a new, empty resultset
+    my $union_rs = $self->result_source->resultset;
+
+    # Filter out duplicate peptides
+    my %peptides;
+
+    foreach my $rs ($self, @other) {
+        foreach my $peptide ($rs->all) {
+            $peptides{ $peptide->id } = $peptide;
+        }
+    }
+
+    # Populate the empty rs with the unique peptides, without hitting
+    # the db
+    $union_rs->set_cache([ values %peptides ]);
+
+    return $union_rs;
+}
+
 sub intersection {
-    my ($self, $other) = @_;
+    my ( $self, @other ) = @_;
 
     return $self->search(
-        { 'me.id' => { IN => $other->get_column('id')->as_query } }
+        {
+            'me.id' =>
+              [ map { { IN => $_->get_column('id')->as_query } } @other ]
+        }
     );
 }
 

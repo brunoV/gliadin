@@ -94,7 +94,7 @@ ResultSet: {
     my $pep_rs = $db->resultset('Peptides');
 
     can_ok( $pep_rs,
-        qw(intersection of_type of_species not_of_type not_of_species) );
+        qw(union intersection of_type of_species not_of_type not_of_species) );
 
     isa_ok( $pep_rs->of_type('foo'),        'Gliadin::ResultSet::Peptides' );
     isa_ok( $pep_rs->not_of_type('foo'),    'Gliadin::ResultSet::Peptides' );
@@ -122,6 +122,13 @@ ResultSet: {
 
     my $i2 = $rs1->intersection($rs3);
     is $i2->count, 4;
+
+    # Testing union
+    my $u1 = $rs1->union($rs2);
+    is $u1->count, $rs1->count;
+
+    my $u2 = $rs1->union($rs3);
+    is $u2->count, $total_count;
 
 }
 
