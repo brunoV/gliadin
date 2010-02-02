@@ -17,7 +17,7 @@ sub insert_protein {
     my ( $self, $protein, $type, $species ) = @_;
 
     unless ($type)    { die "Undefined protein type" }
-    unless ($species) { die "Undefined species" }
+    unless ($species) { die "Undefined species"      }
 
     my $protein_rs;
 
