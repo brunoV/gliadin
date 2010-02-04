@@ -7,17 +7,21 @@ use base 'DBIx::Class::Schema';
 
 __PACKAGE__->load_classes;
 
-
 # Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-01-30 16:26:45
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JX4jLpPPQCuJyqPc6qR+Zw
 
 use Bio::SlidingWindow 'subsequence_iterator';
+use Scalar::Util 'blessed';
 
 sub insert_protein {
     my ( $self, $protein, $type, $species ) = @_;
 
     unless ($type)    { die "Undefined protein type" }
     unless ($species) { die "Undefined species"      }
+
+    if ( blessed($protein) and $protein->can("seq") ) {
+        $protein = _bioseq_to_hashref( $protein );
+    }
 
     my $protein_rs;
 
@@ -27,15 +31,16 @@ sub insert_protein {
             $protein_rs = $self->resultset('Proteins')->create(
                 {
                     species  => $species,
-                    name     => $protein->description,
-                    sequence => $protein->seq,
+                    name     => $protein->{name},
+                    sequence => $protein->{sequence},
                     type     => $type,
-                    gi       => $protein->accession_number,
+                    gi       => $protein->{gi},
                 }
             );
 
             my @peptides =
-              map { { sequence => $_ } } _get_peptides( $protein->seq, 2, 12 );
+              map { { sequence => $_ } }
+              _get_peptides( $protein->{sequence}, 2, 12 );
 
             foreach my $peptide (@peptides) {
 
@@ -108,6 +113,18 @@ sub _get_peptides {
     }
 
     return keys %peptides;
+}
+
+sub _bioseq_to_hashref {
+    my $bio_seq = shift;
+
+    my $hashref;
+
+    $hashref->{name}     = $bio_seq->description;
+    $hashref->{sequence} = $bio_seq->seq;
+    $hashref->{gi}       = $bio_seq->accession_number;
+
+    return $hashref;
 }
 
 1;
