@@ -37,8 +37,6 @@ sub insert_protein {
             my @peptides =
               map { { sequence => $_ } } _get_peptides( $protein->seq, 2, 12 );
 
-            my $peptides_rs = $self->resultset('Peptides');
-
             foreach my $peptide (@peptides) {
 
                 $protein_rs->add_to_peptides($peptide);
