@@ -11,7 +11,10 @@ sub of_type {
 sub not_of_type {
     my ( $self, $type ) = @_;
 
-    return $self->_join_to_proteins( 'type', '!=', $type );
+    my $of_type = $self->of_type($type)->search( {}, { distinct => 1 } );
+
+    return $self->search(
+        { id => { 'NOT IN' => $of_type->get_column('id')->as_query } } );
 }
 
 sub of_species {
@@ -23,7 +26,11 @@ sub of_species {
 sub not_of_species {
     my ( $self, $species ) = @_;
 
-    return $self->_join_to_proteins( 'species', '!=', $species );
+    my $of_species =
+      $self->of_species($species)->search( {}, { distinct => 1 } );
+
+    return $self->search(
+        { id => { 'NOT IN' => $of_species->get_column('id')->as_query } } );
 }
 
 sub _join_to_proteins {

@@ -105,12 +105,17 @@ ResultSet: {
 
     is $pep_rs->of_type('gliadin')->count,        11;
     is $pep_rs->of_type('spagetti')->count,       11;
-    is $pep_rs->not_of_type('spagetti')->count,   11;
-    is $pep_rs->not_of_type('gliadin')->count,    11;
+    is $pep_rs->not_of_type('spagetti')->count,    7;
+    is $pep_rs->not_of_type('gliadin')->count,     7;
     is $pep_rs->of_species('wheat')->count,       11;
     is $pep_rs->of_species('buffalo')->count,     11;
-    is $pep_rs->not_of_species('buffalo')->count, 11;
-    is $pep_rs->not_of_species('wheat')->count,   11;
+    is $pep_rs->not_of_species('buffalo')->count,  7;
+    is $pep_rs->not_of_species('wheat')->count,    7;
+
+    # gliadin:   MA AE EE EL MAE AEE EEL MAEE AEEL MAEEL FOO
+    # spaguetti: MA AE EO OL MAE AEO EOL MAEO AEOL MAEOL FOO
+    # not spaguetti: EE EL AEE EEL MAEE AEEL MAEEL
+    # not gliadin:   EO OL AEO EOL MAEO AEOL MAEOL
 
     # Testing intersection
     my $rs1 = $pep_rs->of_type('gliadin');
