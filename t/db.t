@@ -137,4 +137,13 @@ ResultSet: {
 
 }
 
+Deleting: {
+
+    my $pep_rs = $db->resultset('Peptides');
+
+    lives_ok { $pep_rs->of_type('gliadin')->delete } 'deleting resultset';
+
+    is $pep_rs->of_type('gliadin')->count, 0;
+}
+
 done_testing();

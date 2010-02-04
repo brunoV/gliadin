@@ -40,7 +40,6 @@ sub _join_to_proteins {
         { "protein.$field" => { $operator => $value } },
         {
             join     => { proteins_peptides => 'protein' },
-            distinct => 1
         }
     );
 }
