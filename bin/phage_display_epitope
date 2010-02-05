@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+use YAML;
+
+use lib qw(./lib);
+use Gliadin::Schema;
+
+my $db = Gliadin::Schema->connect("dbi:SQLite:prueba.sqlite");
+
+# $db->insert_protein(
+#     {
+#         sequence => 'KLLPWLR',
+#         name     => 'Epitope selected for 1b4e9 by peptide phage display',
+#         gi       => '1b4e9_epitope_phage_display'
+#     },
+#     '1b4e9 epitope', # type
+#     'none'           # species
+# );
+
+my $epitope_rs = $db->resultset('Peptides')->of_type('1b4e9 epitope');
+
+my @stats;
+
+foreach my $peptide ($epitope_rs->all) {
+    my ( $species, $types );
+
+    foreach my $protein ($peptide->proteins) {
+        $species->{ $protein->species }++;
+        $types->{ $protein->type }++;
+    }
+
+    push @stats, [ $peptide->sequence, $species, $types ];
+}
+
+say Dump(\@stats);
+
+# TODO: Normalizar el conteo: $n * $longitud_peptido / ( $N *
+# $longitud_secuencia )

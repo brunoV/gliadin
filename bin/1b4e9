@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+
+BEGIN {
+    use FindBin qw( $Bin );
+    use lib "$Bin/../lib";
+}
+
+use Modern::Perl;
+use Getopt::Long;
+use Pod::Usage;
+
+my ( $db_in_filename, $db_out_filename, $help );
+
+GetOptions(
+    "db=s"       => \$db_in_filename,
+    "output=s"   => \$db_out_filename,
+    'help|?'     => \$help
+) or pod2usage(2);
+
+pod2usage(2) if ($help or not $db_in);
+
+use Gliadin::Schema;
+
+my $db_in = Gliadin::Schema->connect("dbi:SQLite:$db_in_filename");
+
+my $db_out;
+
+if ( $db_out_filename ) {
+    $db_out = Gliadin::Schema->connect("dbi:SQLite:$db_out_filename");
+    $db_out->deploy;
+}
+
+my $prs = $db->resultset('Peptides');
+
+my $not_glutenin = $prs->not_of_type('glutenin');
+
+my $gamma = $prs->of_type('gamma gliadin');
+
+my $result =
+  $gamma->intersection($not_glutenin)->search( undef, { distinct => 1 } );
+
+$db_out->insert_peptide_rs($result) unless ( not $db_out );
+
+log_peptide_rs($result);
+
+sub log_peptide_rs {
+    my $prs = shift;
+
+    use List::MoreUtils qw(uniq);
+
+    local $, = " ";
+    foreach my $peptide ($prs->all) {
+        say $peptide->sequence;
+        say uniq( map { $_->type } $peptide->proteins );
+        say uniq( map { $_->species } $peptide->proteins );
+        say '-' x 80;
+    }
+
+}
+
+__END__
+
+=head1 1b4e9
+
+Get peptides that satisfy 1b4e9 reactivity characterization (Rumbo et. al 2000)
+
+=head1 SYNOPSIS
+
+1b4e9 --db=database.sqlite --output=output.sqlite
+
+Options:
+    -help    brief help message
