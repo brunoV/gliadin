@@ -7,8 +7,9 @@ use base 'DBIx::Class::Schema';
 
 __PACKAGE__->load_classes;
 
-# Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-01-30 16:26:45
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:JX4jLpPPQCuJyqPc6qR+Zw
+
+# Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-02-05 11:57:07
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LFBIeg396e5vMDco5TohRA
 
 use Bio::SlidingWindow 'subsequence_iterator';
 use Scalar::Util 'blessed';
@@ -23,12 +24,12 @@ sub insert_protein {
         $protein = _bioseq_to_hashref( $protein );
     }
 
-    my $protein_rs;
+    my $protein_r;
 
     $self->txn_do(
         sub {
 
-            $protein_rs = $self->resultset('Proteins')->create(
+            $protein_r = $self->resultset('Proteins')->create(
                 {
                     species  => $species,
                     name     => $protein->{name},
@@ -38,18 +39,11 @@ sub insert_protein {
                 }
             );
 
-            my @peptides =
-              map { { sequence => $_ } }
-              _get_peptides( $protein->{sequence}, 2, 12 );
-
-            foreach my $peptide (@peptides) {
-
-                $protein_rs->add_to_peptides($peptide);
-            }
+            $protein_r->populate_peptides;
         }
     );
 
-    return $protein_rs;
+    return $protein_r;
 }
 
 sub insert_peptide_rr {
