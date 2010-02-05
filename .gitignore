@@ -13,3 +13,4 @@ nytprof/
 *.sqlite
 sequences/
 bin/bp_download*pl
+etc/
