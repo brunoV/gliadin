@@ -14,7 +14,7 @@ sub not_of_type {
     my $of_type = $self->of_type($type)->search( {}, { distinct => 1 } );
 
     return $self->search(
-        { id => { 'NOT IN' => $of_type->get_column('id')->as_query } } );
+        { 'me.id' => { 'NOT IN' => $of_type->get_column('id')->as_query } } );
 }
 
 sub of_species {
