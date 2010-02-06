@@ -30,16 +30,25 @@ sub not_of_species {
       $self->of_species($species)->search( {}, { distinct => 1 } );
 
     return $self->search(
-        { id => { 'NOT IN' => $of_species->get_column('id')->as_query } } );
+        { 'me.id' => { 'NOT IN' => $of_species->get_column('id')->as_query } } );
 }
 
 sub _join_to_proteins {
     my ( $self, $field, $operator, $value ) = @_;
 
+    state $linker_table_of = {
+        "Gliadin::Schema::Peptides"           => 'proteins_peptides',
+        "Gliadin::Schema::FunctionalPeptides" => 'proteins_functional_peptides',
+        "Gliadin::Schema::ChemicalPeptides"   => 'proteins_chemical_peptides',
+        "Gliadin::Schema::SneathPeptides"     => 'proteins_sneath_peptides',
+    };
+
+    my $class = $self->result_class;
+
     return $self->search(
         { "protein.$field" => { $operator => $value } },
         {
-            join     => { proteins_peptides => 'protein' },
+            join     => { $linker_table_of->{$class} => 'protein' },
         }
     );
 }
