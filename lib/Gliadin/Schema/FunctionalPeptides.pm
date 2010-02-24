@@ -1,12 +1,40 @@
 package Gliadin::Schema::FunctionalPeptides;
 
+# Created by DBIx::Class::Schema::Loader
+# DO NOT MODIFY THE FIRST PART OF THIS FILE
+
 use strict;
 use warnings;
 
-use base 'DBIx::Class';
+use base 'DBIx::Class::Core';
 
-__PACKAGE__->load_components("Core");
+
+=head1 NAME
+
+Gliadin::Schema::FunctionalPeptides
+
+=cut
+
 __PACKAGE__->table("functional_peptides");
+
+=head1 ACCESSORS
+
+=head2 id
+
+  data_type: integer
+  default_value: undef
+  is_nullable: 0
+  size: undef
+
+=head2 sequence
+
+  data_type: text
+  default_value: undef
+  is_nullable: 0
+  size: undef
+
+=cut
+
 __PACKAGE__->add_columns(
   "id",
   {
@@ -27,8 +55,8 @@ __PACKAGE__->set_primary_key("id");
 __PACKAGE__->add_unique_constraint("sequence_unique", ["sequence"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-02-05 11:57:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:J9d2b3MWdJGsoMqw8K3hzg
+# Created by DBIx::Class::Schema::Loader v0.05002 @ 2010-02-24 14:21:13
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9yYTvH014qOJG446T9K2Vw
 
 __PACKAGE__->has_many('proteins_functional_peptides', "Gliadin::Schema::ProteinsFunctionalPeptides", { "foreign.peptide_id" => 'self.id' });
 

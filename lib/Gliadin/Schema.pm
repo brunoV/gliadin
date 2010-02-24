@@ -1,5 +1,8 @@
 package Gliadin::Schema;
 
+# Created by DBIx::Class::Schema::Loader
+# DO NOT MODIFY THE FIRST PART OF THIS FILE
+
 use strict;
 use warnings;
 
@@ -8,8 +11,8 @@ use base 'DBIx::Class::Schema';
 __PACKAGE__->load_classes;
 
 
-# Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-02-05 11:57:07
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LFBIeg396e5vMDco5TohRA
+# Created by DBIx::Class::Schema::Loader v0.04006 @ 2010-02-24 14:21:13
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:AuFtxPy1wpV6KlRtJnsJwg
 
 use Bio::SlidingWindow 'subsequence_iterator';
 use Scalar::Util 'blessed';

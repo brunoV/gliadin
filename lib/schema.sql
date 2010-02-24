@@ -16,6 +16,7 @@ create table peptides (
 
 create table proteins_peptides (
     id integer primary key not null,
+    frequency number not null,
     peptide_id integer not null,
     protein_id integer not null,
     unique(peptide_id, protein_id)

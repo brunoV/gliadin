@@ -28,6 +28,7 @@ Basic: {
 
 my $protein_r;
 
+
 Inserting: {
 
     # Inserting Protein
@@ -42,7 +43,6 @@ Inserting: {
     isa_ok($protein_r, 'Gliadin::Schema::Proteins');
 
     # Inserting just as hashref
-
     $protein_r = $db->insert_protein( { sequence => 'MAEOL', gi => 'abd2' },
         'spagetti', 'buffalo' );
 
@@ -50,17 +50,6 @@ Inserting: {
 
 }
 
-Peptides: {
-
-    # Adding a peptide to a protein
-
-    my $peptide_r = $protein_r->add_to_peptides({
-        sequence => 'FOO',
-    });
-
-    isa_ok($peptide_r, 'Gliadin::Schema::Peptides');
-
-}
 
 Integrity: {
 
@@ -71,10 +60,8 @@ Integrity: {
     my $protein_r =
       $db->resultset('Proteins')->find( 'abd', { key => 'gi_unique' } );
 
-    # Add the same peptide that was added to the other protein
-    my $peptide_r = $protein_r->add_to_peptides({
-        sequence => 'FOO',
-    });
+    # peptide that was added to the other protein
+    ok my $peptide_r = $db->resultset('Peptides')->find( 'MAE', { key => 'sequence_unique' } );
 
     # And see what proteins it's connected to
     my @proteins = $peptide_r->proteins;
@@ -100,17 +87,17 @@ ResultSet: {
 
     my $total_count = $pep_rs->count;
 
-    is $pep_rs->of_type('gliadin')->count,        11;
-    is $pep_rs->of_type('spagetti')->count,       11;
+    is $pep_rs->of_type('gliadin')->count,        10;
+    is $pep_rs->of_type('spagetti')->count,       10;
     is $pep_rs->not_of_type('spagetti')->count,    7;
     is $pep_rs->not_of_type('gliadin')->count,     7;
-    is $pep_rs->of_species('wheat')->count,       11;
-    is $pep_rs->of_species('buffalo')->count,     11;
+    is $pep_rs->of_species('wheat')->count,       10;
+    is $pep_rs->of_species('buffalo')->count,     10;
     is $pep_rs->not_of_species('buffalo')->count,  7;
     is $pep_rs->not_of_species('wheat')->count,    7;
 
-    # gliadin:   MA AE EE EL MAE AEE EEL MAEE AEEL MAEEL FOO
-    # spaguetti: MA AE EO OL MAE AEO EOL MAEO AEOL MAEOL FOO
+    # gliadin:   MA AE EE EL MAE AEE EEL MAEE AEEL MAEEL
+    # spaguetti: MA AE EO OL MAE AEO EOL MAEO AEOL MAEOL
     # not spaguetti: EE EL AEE EEL MAEE AEEL MAEEL
     # not gliadin:   EO OL AEO EOL MAEO AEOL MAEOL
 
@@ -123,7 +110,7 @@ ResultSet: {
     is $i1->count, $rs1->count;
 
     my $i2 = $rs1->intersection($rs3);
-    is $i2->count, 4;
+    is $i2->count, 3;
 
     # Testing union
     my $u1 = $rs1->union($rs2);
