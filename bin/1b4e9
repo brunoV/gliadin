@@ -17,7 +17,7 @@ GetOptions(
     'help|?'     => \$help
 ) or pod2usage(2);
 
-pod2usage(2) if ($help or not $db_in);
+pod2usage(2) if ($help or not $db_in_filename);
 
 use Gliadin::Schema;
 
@@ -30,18 +30,36 @@ if ( $db_out_filename ) {
     $db_out->deploy;
 }
 
-my $prs = $db->resultset('Peptides');
+my $prs = $db_in->resultset('Peptides');
 
-my $not_glutenin = $prs->not_of_type('glutenin');
+#my $gli9      = $prs->of_type('Gli#9');
+#my $not_gli33 = $prs->not_of_type('Gli#33');
+my $alpha     = $prs->of_type('alpha gliadin');
+my $beta      = $prs->of_type('beta gliadin');
+my $gamma     = $prs->of_type('gamma gliadin');
+my $omega     = $prs->of_type('omega gliadin');
+my $restof_g  = $prs->of_type('gliadin');
+my $secalin   = $prs->of_type('secalin');
+my $hordein   = $prs->of_type('hordein');
+my $not_oat   = $prs->not_of_species('oat');
+#my $not_glutenin   = $prs->not_of_type('glutenin');
 
-my $gamma = $prs->of_type('gamma gliadin');
+my $result = $alpha->union($beta);
+$result = $result->union($gamma);
+$result = $result->union($omega);
+$result = $result->union($restof_g);
 
-my $result =
-  $gamma->intersection($not_glutenin)->search( undef, { distinct => 1 } );
+foreach my $set ($secalin, $hordein, $not_oat) {
+    $result = $result->intersection($set);
+}
+
+$result = $result->search( undef, { distinct => 1 } );
 
 $db_out->insert_peptide_rs($result) unless ( not $db_out );
 
 log_peptide_rs($result);
+
+say $result->count;
 
 sub log_peptide_rs {
     my $prs = shift;
