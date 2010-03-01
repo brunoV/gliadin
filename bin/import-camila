@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+
+BEGIN {
+    use FindBin qw($Bin);
+    use lib "$Bin/../lib";
+}
+
+use Gliadin::Schema;
+
+my $db = Gliadin::Schema->connect("dbi:SQLite:prueba.sqlite");
+
+my $sequence = 'CMDVVLQQHNIPHGRSQVSHQNTYQLLQQICYQRLWQIPEQSRCQAIHNVVHAIILQQQQQQQQQQPSSQVSFQQPLQQYPLGQGSFRPSQQNPQAQGSVQPQQLPQFEEIRNLALQTLPAMCNVYIPPYCTIAPFGIFGTNGQAGQYPYDVPDYAS';
+my $gi       = 'Gli#33';
+my $name     = $gi;
+my $type     = 'Gli#33';
+my $species  = 'N/A';
+
+# my $sequence = 'VRVPVPQLQPQNPSQQQPQEQVPLVQQLQYPRQQQPFPPQQPYPQPQPFPSQQPLPQRQPFLPQLPYPQPQPFPPQQPYPQPQPQYPQPQQPISQQQAQ';
+# my $gi       = 'Gli#9';
+# my $name     = $gi;
+# my $type     = 'N/A';
+# my $species  = 'N/A';
+
+$db->insert_protein( { sequence => $sequence, gi => $gi, name => $name },
+    $type, $species );
