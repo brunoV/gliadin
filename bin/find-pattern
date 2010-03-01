@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+BEGIN {
+    use FindBin qw( $Bin );
+    use lib "$Bin/../lib";
+}
+
+use perl5i;
+use Getopt::Long;
+use Pod::Usage;
+
+my ( $db_in_filename, $db_out_filename, $regex, $alphabet, $help );
+
+GetOptions(
+    "db=s"         => \$db_in_filename,
+    "regex|r=s"    => \$regex,
+    "alphabet|a:s" => \$alphabet,
+    'help|?'       => \$help
+) or pod2usage(1);
+
+pod2usage(1) if ( $help or not( $db_in_filename and $regex ) );
+
+use Gliadin::Schema;
+
+my $db_in = Gliadin::Schema->connect("dbi:SQLite:$db_in_filename");
+
+my $rs_name = $alphabet ? $alphabet->title_case() . 'Peptides' : 'Peptides';
+
+$db_in->txn_do(
+    sub {
+        my $rs = $db_in->resultset($rs_name);
+
+        my @matches = grep { $_->sequence =~ /$regex/ } $rs->all;
+
+        say "Pattern: $regex";
+        say "Alphabet: $alphabet";
+        log_peptides(@matches);
+
+        sub log_peptides {
+            my @prs = @_;
+
+            use List::MoreUtils qw(uniq);
+
+            local $, = " ";
+            my @sorted =
+              sort { length( $a->sequence ) <=> length( $b->sequence ) } @prs;
+            foreach my $peptide (@sorted) {
+                my @proteins = $peptide->proteins;
+                print $peptide->sequence, "\t",
+                  uniq( map { $_->type } @proteins ),    "\t",
+                  uniq( map { $_->species } @proteins ), "\n";
+            }
+
+        }
+
+    }
+);
+
+=head1 NAME
+
+find-pattern - Find peptides in the db using regular expressions
+
+=head1 SYNOPSIS
+
+    find-pattern [options] --db=dbname --regex=REGEX
+
+    Options: --alphabet   Alphabet of peptide to look for: "sneath",
+                          "chemical" or "functional". Defaults to "",
+                          which uses the standard, 20 aa alphabet.
+=cut
