@@ -14,3 +14,4 @@ nytprof/
 sequences/
 bin/bp_download*pl
 etc/
+*.eps
