@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+BEGIN {
+    use FindBin qw( $Bin );
+    use lib "$Bin/../lib";
+}
+use Gliadin::Schema;
+use perl5i::latest;
+use Term::ProgressBar;
+
+my $dbfile = shift || die "calculate_alphabets db.sqlite";
+
+my $db = Gliadin::Schema->connect("dbi:SQLite:$dbfile");
+
+my $proteins = $db->resultset->('Proteins');
+
+my $count = $proteins->count;
+
+my $bar = Term::ProgressBar->new({ count => $count, ETA => 'linear' });
+
+foreach my $protein ($proteins->all) {
+    $db->txn_do(sub {
+        try { $protein->populate_sneath_peptides };
+        try { $protein->populate_chemical_peptides };
+    });
+
+    $bar->update();
+}
+
+say;
