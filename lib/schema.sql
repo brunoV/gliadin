@@ -30,6 +30,7 @@ create table chemical_peptides (
 
 create table proteins_chemical_peptides (
     id integer primary key not null,
+    frequency number not null,
     peptide_id integer not null,
     protein_id integer not null,
     unique(peptide_id, protein_id)
@@ -43,6 +44,7 @@ create table functional_peptides (
 
 create table proteins_functional_peptides (
     id integer primary key not null,
+    frequency number not null,
     peptide_id integer not null,
     protein_id integer not null,
     unique(peptide_id, protein_id)
@@ -56,6 +58,7 @@ create table sneath_peptides (
 
 create table proteins_sneath_peptides (
     id integer primary key not null,
+    frequency number not null,
     peptide_id integer not null,
     protein_id integer not null,
     unique(peptide_id, protein_id)

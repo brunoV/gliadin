@@ -110,8 +110,8 @@ __PACKAGE__->add_unique_constraint("gi_unique", ["gi"]);
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:xRHyTB9UfOZ4H4MzDH/ECQ
 
 use Modern::Perl;
-use Bio::SlidingWindow 'subsequence_iterator';
 use Try::Tiny;
+use Bio::SlidingWindow 'subsequence_iterator';
 
 ## Set many_to_many for peptides
 __PACKAGE__->has_many(
@@ -148,29 +148,32 @@ __PACKAGE__->many_to_many( 'sneath_peptides', 'proteins_sneath_peptides', 'pepti
 sub populate_peptides {
     my ( $self, $alphabet ) = @_;
 
-    my $add =
-      defined $alphabet
-      ? "add_to_" . $alphabet . "_peptides"
-      : "add_to_peptides";
-
     my @peptides =
       map { { sequence => $_ } }
       _get_peptides( _to_alphabet( $self->sequence, $alphabet ), 2, 12 );
 
     my $db = $self->result_source->schema;
 
-    my $peptides_rs = $db->resultset('Peptides');
-    my $linker_rs   = $db->resultset('ProteinsPeptides');
+    if ($alphabet) {
+        $alphabet =~ s/\b(\w)/\U$1/;
+    }
+
+    no warnings 'uninitialized';
+    my $peptides_rs = $db->resultset($alphabet . 'Peptides');
+    my $linker_rs   = $db->resultset('Proteins' . $alphabet . 'Peptides');
 
     foreach (@peptides) {
-        my $peptide = try { $db->resultset('Peptides')->find_or_create($_) };
+        my $peptide = try { $peptides_rs->find_or_create($_) };
         if ($peptide) {
-            $linker_rs->create(
+            $linker_rs->find_or_create(
                 {
                     protein_id => $self->id,
                     peptide_id => $peptide->id,
-                    frequency  => $peptide->frequency( $self->sequence )
-                }
+                    frequency  => $peptide->frequency( _to_alphabet($self->sequence, $alphabet) )
+                },
+                {
+                    key => 'peptide_id_protein_id_unique',
+                },
             );
         }
     }

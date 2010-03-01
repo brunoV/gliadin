@@ -6,7 +6,7 @@ package Gliadin::Schema::Peptides;
 use strict;
 use warnings;
 
-use base 'DBIx::Class::Core';
+use base 'Gliadin::Result::Peptide';
 
 
 =head1 NAME
@@ -63,30 +63,5 @@ __PACKAGE__->has_many('proteins_peptides', "Gliadin::Schema::ProteinsPeptides", 
 __PACKAGE__->many_to_many('proteins', 'proteins_peptides', 'protein');
 
 __PACKAGE__->resultset_class("Gliadin::ResultSet::Peptides");
-
-sub frequency {
-    my ($peptide, $seq) = @_;
-    $seq || die "No sequence argument\n";
-
-    my %frequency_of;
-    if ( ref $seq and $seq->isa("Gliadin::ResultSet::Proteins") ) {
-        foreach my $protein ($seq->all) {
-            $frequency_of{$protein->id} = $peptide->_frequency($protein->sequence);
-        }
-
-        return \%frequency_of;
-    }
-    else {
-        return $peptide->_frequency($seq);
-    }
-}
-
-sub _frequency {
-    my ($peptide, $seq) = @_;
-
-    my @count = $seq =~ /${\$peptide->sequence}/g;
-
-    return @count / length($seq);
-}
 
 1;

@@ -6,7 +6,7 @@ package Gliadin::Schema::SneathPeptides;
 use strict;
 use warnings;
 
-use base 'DBIx::Class::Core';
+use base 'Gliadin::Result::Peptide';
 
 
 =head1 NAME

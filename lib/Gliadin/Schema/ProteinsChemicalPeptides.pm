@@ -26,6 +26,13 @@ __PACKAGE__->table("proteins_chemical_peptides");
   is_nullable: 0
   size: undef
 
+=head2 frequency
+
+  data_type: number
+  default_value: undef
+  is_nullable: 0
+  size: undef
+
 =head2 peptide_id
 
   data_type: integer
@@ -50,6 +57,13 @@ __PACKAGE__->add_columns(
     is_nullable => 0,
     size => undef,
   },
+  "frequency",
+  {
+    data_type => "number",
+    default_value => undef,
+    is_nullable => 0,
+    size => undef,
+  },
   "peptide_id",
   {
     data_type => "integer",
@@ -69,8 +83,8 @@ __PACKAGE__->set_primary_key("id");
 __PACKAGE__->add_unique_constraint("peptide_id_protein_id_unique", ["peptide_id", "protein_id"]);
 
 
-# Created by DBIx::Class::Schema::Loader v0.05002 @ 2010-02-24 14:21:13
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:J6B89nciXdBBpYlutHbY0Q
+# Created by DBIx::Class::Schema::Loader v0.05002 @ 2010-02-24 20:15:41
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:Tr9a7s5hEIwyuJubFK9f5Q
 
 __PACKAGE__->belongs_to( 'peptide', "Gliadin::Schema::ChemicalPeptides",
     { id => "peptide_id" } );
