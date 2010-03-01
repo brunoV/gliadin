@@ -1,9 +1,16 @@
 #!/usr/bin/env perl
 use Modern::Perl;
+use Getopt::Long;
 use File::Basename 'basename';
 use FindBin '$Bin';
 
+my ($db_file, $help);
+
+GetOptions( 'db=s' => \$db_file, 'help|?' => \$help );
+
 my @files = @ARGV;
+
+usage() if ( $help or !$db_file or !@files );
 
 foreach my $filename (@files) {
 
@@ -12,6 +19,18 @@ foreach my $filename (@files) {
 
     my ($species, $type) = split / /, $basename, 2;
 
+    die "File $filename has unspecified file name.\n" unless ($species and $type);
+
     say "inserting $filename";
-    system( qq($Bin/import-to-db --db=prueba.sqlite --type="$type" --species=$species $filename) );
+    system( qq($Bin/import-to-db --db=$db_file --type="$type" --species=$species $filename) );
+}
+
+sub usage {
+    warn <<USAGE;
+multi-import --db=database.sqlite [ FILES ]
+
+Filename must have the format:
+    species_protein_type.gb
+USAGE
+
 }
